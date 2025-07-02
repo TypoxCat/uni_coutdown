@@ -78,7 +78,8 @@ else:
 # Assets setup based on weather
 weather = get_weather_openmeteo(city_data["latitude"], city_data["longitude"])
 print(weather)
-weather['weathercode'] = 52
+sky = "night"
+weather['weathercode'] = 1
 cloud = False
 match weather['weathercode']:
     case 0:
