@@ -8,6 +8,10 @@ pygame.init()
 
 #------variables, objects, functions
 PATH = '4_Weather/imgs/'
+FONT_PATH = '4_Weather/font/PixelifySans.ttf'
+temp_font = pygame.font.Font(FONT_PATH, 64)
+status_font = pygame.font.Font(FONT_PATH, 18)
+
 
 def load_image(folder, file):
     return pygame.image.load(os.path.join(PATH, folder, file))
@@ -19,6 +23,7 @@ def get_weather_openmeteo(lat, lon):
 
     current = data['current_weather']
     return current
+
 
 backgrounds = {
     "day": {
@@ -36,6 +41,12 @@ backgrounds = {
         "rain": "night_rain.png",
         "winter": "night_winter.png"
     }
+}
+
+box = {
+    "day": "day-box.png",
+    "evening": "evening-box.png",
+    "night": "night-box.png"
 }
 
 clouds = {
@@ -70,16 +81,25 @@ city_data = {
 current_time = datetime.now().strftime("%H:%M")
 if current_time > "18:00":
     sky = "night"
+    text_box = "night"
 elif current_time > "15:00":
     sky = "evening"
+    text_box = "evening"
 else:
     sky = "day"
+    text_box = "day"
 
 # Assets setup based on weather
 weather = get_weather_openmeteo(city_data["latitude"], city_data["longitude"])
 print(weather)
-sky = "night"
-weather['weathercode'] = 1
+
+
+# check img
+# sky = "night"
+# text_box = "night"
+
+
+# weather['weathercode'] = 1
 cloud = False
 match weather['weathercode']:
     case 0:
@@ -100,11 +120,41 @@ match weather['weathercode']:
         cloth = "winter"
         offset = (40, 175)
 
+# Text setup
+temperature = weather["temperature"]
+status_map = {
+    0: "Clear",
+    1: "Mainly Clear",
+    2: "Partly Cloudy",
+    3: "Overcast",
+    45: "Fog",
+    48: "Depositing Fog",
+    51: "Light Drizzle",
+    53: "Moderate Drizzle",
+    55: "Dense Drizzle",
+    56: "Freezing Drizzle",
+    57: "Freezing Drizzle+",
+    61: "Light Rain",
+    63: "Moderate Rain",
+    65: "Heavy Rain",
+    80: "Light Showers",
+    81: "Moderate Showers",
+    82: "Violent Showers"
+    # Add more codes as needed
+}
+weather_status = status_map.get(weather["weathercode"], "Unknown")
+
 # Loading assets
 bg_img = load_image("background/", backgrounds[sky][condition])
-print(clouds["day"])
 if cloud:
     cloud_img = load_image("clouds/", clouds[sky])
+box_img = load_image("box/", box[text_box])
+box_img.set_alpha(180) 
+cat_img = load_image("cats/", cats[cat_index])
+cloth_img = load_image("clothes/", clothes[cloth])
+
+temp_text = temp_font.render(f"{int(temperature)}°C", True, (255, 255, 255))
+status_text = status_font.render(weather_status, True, (255, 255, 255))
 
 # Set up the game window
 screen = pygame.display.set_mode((190, 360))
@@ -116,8 +166,12 @@ while running:
     screen.blit(bg_img, (0, 0))
     if cloud:
         screen.blit(cloud_img, (0, 30))
-    screen.blit(load_image("cats/", cats[cat_index]), (40, 210))
-    screen.blit(load_image("clothes/", clothes[cloth]), offset)
+    screen.blit(box_img, (10, 10))
+    screen.blit(temp_text, (20, 40))
+    screen.blit(status_text, (20, 30))
+
+    screen.blit(cat_img, (40, 210))
+    screen.blit(cloth_img , offset)
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
