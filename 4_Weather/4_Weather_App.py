@@ -1,7 +1,8 @@
 import os
 import pygame
+import pytz
 import requests
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Initialize Pygame
 pygame.init()
@@ -70,58 +71,6 @@ clothes = {
     "winter": "cloth_winter.png"
 }
 
-city_data = {
-    "city_name": "Yogyakarta",
-    "country": "Indonesia",
-    "latitude": "-7.782961",
-    "longitude": "110.367086"
-}
-
-# Background setup
-current_time = datetime.now().strftime("%H:%M")
-if current_time > "18:00":
-    sky = "night"
-    text_box = "night"
-elif current_time > "15:00":
-    sky = "evening"
-    text_box = "evening"
-else:
-    sky = "day"
-    text_box = "day"
-
-# Assets setup based on weather
-weather = get_weather_openmeteo(city_data["latitude"], city_data["longitude"])
-print(weather)
-
-
-# check img
-# sky = "night"
-# text_box = "night"
-
-
-# weather['weathercode'] = 1
-cloud = False
-match weather['weathercode']:
-    case 0:
-        condition = "clear"
-        cloth = "sunny"
-        offset = (32, 245)
-    case 1 | 2 | 3 | 45 | 48:
-        condition = "clear"
-        cloth = "windy"
-        offset = (17, 172)
-        cloud = True
-    case 51 | 53 | 55 | 56 | 57 | 61 | 63 | 65 | 80 | 81 | 82:
-        condition = "rain"
-        cloth = "rain"
-        offset = (12, 167)
-    case _:
-        condition = "winter"
-        cloth = "winter"
-        offset = (40, 175)
-
-# Text setup
-temperature = weather["temperature"]
 status_map = {
     0: "Clear",
     1: "Mainly Clear",
@@ -142,7 +91,65 @@ status_map = {
     82: "Violent Showers"
     # Add more codes as needed
 }
+
+city_data = {
+    "city_name": "Yogyakarta",
+    "country": "Indonesia",
+    "latitude": "-7.782961",
+    "longitude": "110.367086"
+}
+
+friend_data = {
+    "city_name": "Tokyo",
+    "country": "Japan",
+    "latitude": "35.6895",
+    "longitude": "139.6917"
+}
+
+def get_sky(current_time):
+    if current_time > "18:00":
+        return "night", "night"
+    elif current_time > "15:00":
+        return "evening", "evening"
+    else:
+        return "day", "day"
+
+# Background setup
+current_time = datetime.now().strftime("%H:%M")
+friend_tz = pytz.timezone("Australia/Canberra")
+friend_time = datetime.now(friend_tz).strftime("%H:%M")
+
+sky, text_box = get_sky(current_time)
+friend_sky, friend_text_box = get_sky(friend_time)
+
+# Assets setup based on weather
+weather = get_weather_openmeteo(city_data["latitude"], city_data["longitude"])
+temperature = weather["temperature"]
+time = weather['time']
+print(time)
 weather_status = status_map.get(weather["weathercode"], "Unknown")
+
+friend_weather = get_weather_openmeteo(friend_data["latitude"], friend_data["longitude"])
+friend_temperature = friend_weather["temperature"]
+friend_status = status_map.get(friend_weather["weathercode"], "Unknown")
+
+# weather['weathercode'] = 1
+cloud = False
+
+def get_weatherCode(weathercode):
+    match weathercode:
+        case 0 | 1:
+            return "clear", "sunny", (32, 245), False
+        case 2 | 3 | 45 | 48:
+            return "clear", "windy", (17, 172), True
+        case 51 | 53 | 55 | 56 | 57 | 61 | 63 | 65 | 80 | 81 | 82:
+            return "rain", "rain", (12, 167), False
+        case _:
+            return "winter", "winter", (40, 175), False
+        
+condition, cloth, offset, cloud = get_weatherCode(weather['weathercode'])
+friend_condition, friend_cloth, friend_offset, friend_cloud = get_weatherCode(friend_weather['weathercode'])
+
 
 # Loading assets
 bg_img = load_image("background/", backgrounds[sky][condition])
@@ -156,8 +163,22 @@ cloth_img = load_image("clothes/", clothes[cloth])
 temp_text = temp_font.render(f"{int(temperature)}°C", True, (255, 255, 255))
 status_text = status_font.render(weather_status, True, (255, 255, 255))
 
+# Loading friend assets
+friend_bg_img = load_image("background/", backgrounds[friend_sky][friend_condition])
+friend_box_img = load_image("box/", box[friend_text_box])
+friend_box_img.set_alpha(180)
+
+if friend_cloud:
+    friend_cloud_img = load_image("clouds/", clouds[friend_sky])
+
+friend_cat_img = load_image("cats/", cats[cat_index])
+friend_cloth_img = load_image("clothes/", clothes[friend_cloth])
+
+friend_temp_text = temp_font.render(f"{int(friend_temperature)}°C", True, (255, 255, 255))
+friend_status_text = status_font.render(friend_status, True, (255, 255, 255))
+
 # Set up the game window
-screen = pygame.display.set_mode((190, 360))
+screen = pygame.display.set_mode((190*2, 360))
 pygame.display.set_caption("Meownie Weather")
 
 # Game loop
@@ -172,6 +193,17 @@ while running:
 
     screen.blit(cat_img, (40, 210))
     screen.blit(cloth_img , offset)
+
+    # Friend's weather panel
+    screen.blit(friend_bg_img, (190, 0))
+    if friend_cloud:
+        screen.blit(friend_cloud_img, (190, 30))
+    screen.blit(friend_box_img, (190 + 10, 10))
+    screen.blit(friend_temp_text, (190 + 20, 40))
+    screen.blit(friend_status_text, (190 + 20, 30))
+    screen.blit(friend_cat_img, (190 + 40, 210))
+    screen.blit(friend_cloth_img, (190 + friend_offset[0], friend_offset[1]))
+
     pygame.display.update()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -186,4 +218,4 @@ while running:
 pygame.quit()
 
 # TO DO:
-# add temperature, time, status, friend
+# button to change cat each panel(self/friend)
