@@ -1,9 +1,12 @@
-to run venv in terminal do this
+HI! I am coding everyday until college start. In this project i mainly use python to learn new things.
+This project contains varies project such as:
+- Desktop app
+- Menubar app (Mac)
+- Web Scraping
+- Data Visualisation
+
+
+
+Personal notes:
+- to run venv in terminal do this
 $source .venv/bin/activate
-
-Notes:
-- tkinter is installed with brew because it cannot be installed with pip (idk why) but can still run in venv
-
-What I learned:
-1_Random_Quote
-- tkinker
