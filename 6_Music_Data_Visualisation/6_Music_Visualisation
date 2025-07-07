@@ -1,0 +1,51 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Get the data frame
+data_path = 'spotify_musicstax_dataset.csv'
+music_data = pd.read_csv(data_path)
+df = pd.DataFrame(music_data)
+
+# Features to plot
+features = ['Energy', 'Danceability', 'Positiveness', 'Speechiness', 'Liveness', 'Acousticness', 'Instrumentalness']
+values = [df[feature].mean() for feature in features]
+
+# Print percentage values in console
+print("🎯 Average values for your Musical DNA:")
+for feature, val in zip(features, values):
+    print(f"{feature}: {val:.2%}")
+
+# Close the radar loop
+values += values[:1]
+angles = np.linspace(0, 2 * np.pi, len(features), endpoint=False).tolist()
+angles += angles[:1]
+
+# Set up radar plot
+fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
+
+# Plot line and fill
+ax.plot(angles, values, color='blue', linewidth=2)
+ax.fill(angles, values, color='skyblue', alpha=0.4)
+
+# Axis labels
+ax.set_xticks(angles[:-1])
+ax.set_xticklabels(features)
+
+# Grid labels
+ax.set_rlabel_position(0)
+ax.set_yticks([0.2, 0.4, 0.6, 0.8, 1.0])
+ax.set_yticklabels(["20%", "40%", "60%", "80%", "100%"], color="gray", size=10)
+ax.set_ylim(0, 1)
+
+# 🎯 Add percentage labels near each point
+for angle, value, label in zip(angles, values, features + [features[0]]):
+    x = angle
+    y = value
+    ax.text(x, y + 0.05, f"{value:.0%}", ha='center', va='center', fontsize=9, color='black')
+
+# Title
+ax.set_title("🎵 My Musical DNA", fontsize=16, pad=20)
+
+plt.tight_layout()
+plt.show()
