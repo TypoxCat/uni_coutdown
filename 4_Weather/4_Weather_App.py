@@ -95,15 +95,15 @@ status_map = {
 city_data = {
     "city_name": "Yogyakarta",
     "country": "Indonesia",
-    "latitude": "-7.782961",
-    "longitude": "110.367086"
+    "latitude": "10.782961",
+    "longitude": "-80.367086"
 }
 
 friend_data = {
     "city_name": "Tokyo",
     "country": "Japan",
-    "latitude": "35.6895",
-    "longitude": "139.6917"
+    "latitude": "-35.6895",
+    "longitude": "-139.6917"
 }
 
 def get_sky(current_time):
@@ -116,7 +116,7 @@ def get_sky(current_time):
 
 # Background setup
 current_time = datetime.now().strftime("%H:%M")
-friend_tz = pytz.timezone("Australia/Canberra")
+friend_tz = pytz.timezone("Europe/Helsinki")
 friend_time = datetime.now(friend_tz).strftime("%H:%M")
 
 sky, text_box = get_sky(current_time)

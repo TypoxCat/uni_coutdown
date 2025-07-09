@@ -10,3 +10,5 @@ This project contains varies project such as:
 Personal notes:
 - to run venv in terminal do this
 $source .venv/bin/activate
+- clean terminal
+export PROMPT=" $";clear;  

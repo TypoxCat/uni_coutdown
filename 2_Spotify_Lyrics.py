@@ -45,7 +45,7 @@ def parse_lrc(lrc_text):
 def fetch_lyrics_sync(track_title):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    try:
+    try: 
         return loop.run_until_complete(fetch_lrc(track_title, plain_only=False, synced_only=True))
     finally:
         loop.close()
@@ -129,12 +129,3 @@ def start_sync():
 # --- Start ---
 start_sync()
 root.mainloop()
-
-
-
-
-# Detect sporify track MacOS, also detect when changing song, if ads then dont show anything
-# Detect current song position
-# GUI 
-# GUI allow overlap app and keep on top
-# Make it copyable

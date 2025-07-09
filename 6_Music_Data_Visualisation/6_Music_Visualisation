@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Get the data frame
-data_path = 'spotify_musicstax_dataset.csv'
+data_path = '6_Music_Data_Visualisation/spotify_musicstax_dataset.csv'
 music_data = pd.read_csv(data_path)
 df = pd.DataFrame(music_data)
 
