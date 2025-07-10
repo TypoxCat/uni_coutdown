@@ -36,7 +36,7 @@ window.onload = function () {
     context.drawImage(catImg, cat_x, cat_y, blocksize, blocksize);
     placeFish();
     document.addEventListener("keyup", changeDirection); //if click run changeDirection
-    setInterval(update, 1000 / 5);
+    setInterval(update, 1000 / 6); //change the number in back to adjust speed
 }
 
 function boardPattern(){
