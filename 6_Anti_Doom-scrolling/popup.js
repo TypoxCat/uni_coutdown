@@ -1,35 +1,32 @@
-let startTime;
-let timerInterval;
+const count = document.getElementById("scroll-count");
+const timess = document.getElementById("timer");
 
+// every time i open the popup
 document.addEventListener("DOMContentLoaded", () => {
-  const count = document.getElementById("scroll-count")
-  const timer = document.getElementById("timer")
-  // const time = document.getElementById("active-time")
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tabId = tabs[0].id;
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0].id;
 
-    // send message to content script
-    chrome.tabs.sendMessage(tabId, { action: "getScrollCount" }, (response) => {
-      console.log(`✅ Received from content: ${response.scrollCount}`);
-      count.textContent = `Scroll: ${response.scrollCount}`;
-      timer.textContent = `${response.mins}:${response.secs}`
+        // send message to content script
+        chrome.tabs.sendMessage(tabId, { action: "getScrollCount" }, (response) => {
+            console.log(`✅ Received from content`);
+            count.textContent = `Scroll: ${response.scrollCount}`;
+            timess.textContent = `${response.mins}:${response.secs}`
+        });
     });
-  });
 });
 
 document.getElementById("reset").addEventListener("click", () => {
-  if (timerInterval) {
-    clearInterval(timerInterval);
-    elapsed += Date.now() - startTime;
-    timerInterval = null;
-  }
-  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tabs[0].id },
-      func: () => {
-        scrollCount = 0;
-        alert("Scroll count reset!");
-      },
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tabId = tabs[0].id;
+        // Tell content script to reset the timer and scroll count
+        chrome.tabs.sendMessage(tabId, { action: "resetScroll" }, () => {
+            alert("Scroll count and timer reset!");
+
+            // Refresh values in popup
+            chrome.tabs.sendMessage(tabId, { action: "getScrollCount" }, (response) => {
+                count.textContent = `Scroll: ${response.scrollCount}`;
+                timess.textContent = `${response.mins}:${response.secs}`;
+            });
+        });
     });
-  });
 });
