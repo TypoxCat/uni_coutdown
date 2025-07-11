@@ -157,8 +157,9 @@ header {
     display: flex;
     justify-content: center;
 }
+
 .game {
-    background-color: #faebd7;
+    border-bottom: 5px solid #e8baba;
     display: inline-block;
 }
 
@@ -171,6 +172,7 @@ header {
 #snake {
     border: 20px solid #e6dae0;
 }
+
 .game {
     position: relative;
     display: inline-block;
@@ -207,3 +209,71 @@ header {
   font-weight: bold;
   cursor: pointer;
 }
+
+/* game 8 */
+
+#window {
+	height: 260px;
+    width: 800px;
+    position: relative;
+}
+
+#cat {
+	height: 60px;
+    width: 50px;
+	background-repeat: no-repeat;
+	position: absolute;
+	top: 200px;
+    left: 150px;
+    transition: background-image 0.3s;
+}
+
+#cat::before {
+    content: "";
+	position: absolute;
+	inset: 0;
+	background-image: url('8_imgs/catjump2.png');
+	background-repeat: no-repeat;
+	background-size: auto 60px;
+	opacity: 0;
+	transition: opacity 0.05s;
+}
+
+#cat:not(.jump) {
+	background-image: url('8_imgs/catjump.png');
+	background-repeat: no-repeat;
+	background-size: auto 60px;
+    top: 200px;
+    left: 150px;
+}
+
+.jump {
+	animation: jump 0.3s linear; 
+    background-image: none;
+}
+
+#cat.jump::before {
+    opacity: 1;
+}
+
+@keyframes jump {
+	0%   { top: 160px; }
+	20%  { top: 120px; }
+	40%  { top: 85px; }
+	60%  { top: 80px; }
+	80%  { top: 115px; }
+	100% { top: 160px; }
+}
+
+#obstacle {
+	height: 60px;
+    width: 50px;
+	background-repeat: no-repeat;
+	background-size: auto 60px;
+	position: absolute;
+    top: 200px;
+}
+
+@keyframes obs-block { 
+    0% { left: 750px; } 
+    100% { left: 5px; } }
